@@ -40,57 +40,67 @@ room['treasure'].s_to = room['narrow']
 
 # Make a new player object that is currently in the 'outside' room.
 
-player = Player(name='Player 1', current_room='outside')
+player = Player('Player 1', room['outside'])
 # Write a loop that:
 #
 # * Prints the current room name 
-# * Prints the current description (the textwrap module might be useful here). TODO
+# * Prints the current description (the textwrap module might be useful here).
 # * Waits for user input and decides what to do.
 #
-# If the user enters a cardinal direction, attempt to move to the room there. TODO
-# Print an error message if the movement isn't allowed. TODO
+# If the user enters a cardinal direction, attempt to move to the room there. 
+# Print an error message if the movement isn't allowed.
 #
-# If the user enters "q", quit the game. TODO
+# If the user enters "q", quit the game.
 
 def adv():
 
+    # print(room[player.current_room].n_to)
     def ask():
         input_ = ''
         while not input_:
-            print('Your current room: ', room[player.current_room].name)
-            print("Your current room's description: ", room[player.current_room].description)
+            print('Your current room: ', player.current_room.name)
+            print("Your current room's description: ", player.current_room.description)
             input_ = input("You're in a room! Enter a cardinal direction! Press q to quit. \n")
         return input_
     
     input_ = ask()
 
-    if input_.lower() in ['north', 'south', 'east', 'west']:
-        #TODO movement
-        current_room = room[player.current_room]
-        if input_ == 'north':
-            if hasattr(current_room, 'n_to'):
-                player.current_room = current_room.n_to
+    def move(input_):
+        if input_.lower() in ['north', 'south', 'east', 'west']:
+            #TODO movement
+            if input_ == 'north':
+                if player.current_room.n_to is not None:
+                    player.current_room = player.current_room.n_to
+                    input_ = ask()
+                    move(input_)
+                else:
+                    print("Can't go that direction!\n")
+                    input_ = ask()
+            if input_ == 'south':
+                if hasattr(player.current_room, 's_to'):
+                    player.current_room = room[player.current_room].s_to
+                else:
+                    print("Can't go that direction!\n")
+                    input_ = ask()
+            if input_ == 'east':
+                if hasattr(player.current_room, 'e_to'):
+                    player.current_room = current_room.e_to
+                else:
+                    print("Can't go that direction!\n")
+                    input_ = ask()
             else:
-                ask()
-        if input_ == 'south':
-            if hasattr(current_room, 's_to'):
-                player.current_room = current_room.s_to
-            else:
-                ask()
-        if input_ == 'east':
-            if hasattr(current_room, 'e_to'):
-                player.current_room = current_room.e_to
-            else:
-                ask()
+                if hasattr(current_room, 'w_to'):
+                    player.current_room = current_room.w_to
+                else:
+                    print("Can't go that direction!\n")
+                    input_ = ask()
+        elif input_.lower() == 'q':
+            exit()
         else:
-            if hasattr(current_room, 'w_to'):
-                player.current_room = current_room.w_to
-            else:
-                ask()
-    elif input_.lower() == 'q':
-        exit()
-    else:
-        print('\nInvalid input. Try again!')
-        ask()
-
+            print('\nInvalid input. Try again!')
+            input_ = ask()
+            move(input_)
+        
+        return move(input_)
+    move(input_)
 adv()
